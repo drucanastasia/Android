@@ -130,21 +130,8 @@ class _CalculatorState extends State<Calculator> {
 
               SizedBox(height: 20),
 
-              // REZULTATE
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(20),
-
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-
-                child: Column(
-                  children: [
-
                     Text(
-                      "Salariu net: ${salariuNet.toStringAsFixed(2)} lei",
+                      "Salariu net: ${salariuNet.toStringAsFixed(4)} lei",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -154,20 +141,15 @@ class _CalculatorState extends State<Calculator> {
                     SizedBox(height: 10),
 
                     Text(
-                      "Impozit: ${impozit.toStringAsFixed(2)} lei",
+                      "Impozit: ${impozit.toStringAsFixed(4)} lei",
                       style: TextStyle(
                         fontSize: 16,
                       ),
                     ),
-
                   ],
                 ),
               ),
-
-            ],
           ),
-        ),
-      ),
     );
   }
 }
