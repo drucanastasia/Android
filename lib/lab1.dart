@@ -33,7 +33,7 @@ class _CalculatorState extends State<Calculator> {
           child: Column(
             children: [
 
-              // TITLU
+
               Text(
                 "Calculator pentru Salariu",
                 style: TextStyle(
@@ -44,7 +44,6 @@ class _CalculatorState extends State<Calculator> {
 
               SizedBox(height: 30),
 
-              // CÂMP SALARIU
               TextField(
                 controller: salariuController,
                 keyboardType: TextInputType.number,
@@ -57,7 +56,7 @@ class _CalculatorState extends State<Calculator> {
 
               SizedBox(height: 20),
 
-              // TIP ANGAJAT
+
               Text(
                 "Tip angajat",
                 style: TextStyle(
@@ -98,7 +97,7 @@ class _CalculatorState extends State<Calculator> {
 
               SizedBox(height: 10),
 
-              // BUTON
+
               SizedBox(
                 width: double.infinity,
                 height: 50,
@@ -131,7 +130,7 @@ class _CalculatorState extends State<Calculator> {
               SizedBox(height: 20),
 
                     Text(
-                      "Salariu net: ${salariuNet.toStringAsFixed(4)} lei",
+                      "Salariu net: ${salariuNet.toStringAsFixed(2)} lei",
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -141,7 +140,7 @@ class _CalculatorState extends State<Calculator> {
                     SizedBox(height: 10),
 
                     Text(
-                      "Impozit: ${impozit.toStringAsFixed(4)} lei",
+                      "Impozit: ${impozit.toStringAsFixed(2)} lei",
                       style: TextStyle(
                         fontSize: 16,
                       ),
