@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
+import '../main.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../cubit/medical_cubit.dart';
+import '../cubit/medical_state.dart';
+import '../models/medical_data.dart';
 import 'appointment_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -7,7 +11,18 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return BlocBuilder<MedicalCubit, MedicalState>(
+      builder: (context, state) {
+        if (state is MedicalLoading) {
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
+        }
+        if (state is MedicalError) {
+          return Scaffold(body: Center(child: Text(state.message)));
+        }
+        final doctors = state is MedicalSuccess ? state.visibleDoctors : <Doctor>[];
+        final favorites = state is MedicalSuccess ? state.favoriteIds :
+          state is MedicalEmpty ? state.favoriteIds : <String>{};
+        return Scaffold(
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -17,9 +32,11 @@ class HomeScreen extends StatelessWidget {
               children: [
                 _topRow(),
                 const SizedBox(height: 22),
-                _searchBar(),
+                _searchBar(context),
                 const SizedBox(height: 18),
 
+                // SINGURA functionalitate:
+                // apasarea pe cardul Appointment deschide pagina Appointment.
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -39,24 +56,29 @@ class HomeScreen extends StatelessWidget {
                 const SizedBox(height: 26),
                 _sectionTitle('Nearby Doctor'),
                 const SizedBox(height: 16),
-                _doctor(
-                  image: 'assets/photos/dr-emmly.png',
-                  name: 'Dr. Emmly Lestiryno',
-                  speciality: 'General Practitioner',
-                  address: '3167 Durgan Shores - 500M from you',
-                ),
-                const SizedBox(height: 18),
-                _doctor(
-                  image: 'assets/photos/dr-sonja.png',
-                  name: 'Dr. Sonja Littel',
-                  speciality: 'Dental Specialist',
-                  address: '950 Sigrid Port - 753M from you',
-                ),
+                if (state is MedicalEmpty)
+                  const Text('No doctors found')
+                else
+                  ...doctors.asMap().entries.map((entry) => Padding(
+                    padding: EdgeInsets.only(bottom: entry.key == doctors.length - 1 ? 0 : 18),
+                    child: _doctor(
+                      image: entry.value.id == 'doctor-001'
+                          ? 'assets/photos/dr-emmly.png'
+                          : 'assets/photos/dr-sonja.png',
+                      name: entry.value.name,
+                      speciality: entry.value.specialty,
+                      address: entry.value.distance,
+                      favorite: favorites.contains(entry.value.id),
+                      onFavorite: () => context.read<MedicalCubit>().toggleFavorite(entry.value.id),
+                    ),
+                  )),
               ],
             ),
           ),
         ),
       ),
+    );
+      },
     );
   }
 
@@ -117,7 +139,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _searchBar() {
+  Widget _searchBar(BuildContext context) {
     return Container(
       height: 48,
       padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -125,30 +147,27 @@ class HomeScreen extends StatelessWidget {
         color: const Color(0xFFFAFAFC),
         borderRadius: BorderRadius.circular(15),
       ),
-      child: const Row(
-        children: [
-          Icon(
-            Icons.search_rounded,
-            color: Color(0xFFB7C0D1),
-            size: 22,
+      child: Row(children: [
+        const Icon(Icons.search_rounded, color: Color(0xFFB7C0D1), size: 22),
+        const SizedBox(width: 12),
+        Expanded(child: TextField(
+          onChanged: context.read<MedicalCubit>().search,
+          style: const TextStyle(fontSize: 11, color: AppColors.dark),
+          decoration: const InputDecoration(
+            hintText: 'Search something',
+            hintStyle: TextStyle(fontSize: 11, color: Color(0xFFB7C0D1)),
+            border: InputBorder.none,
+            isDense: true,
+            contentPadding: EdgeInsets.zero,
           ),
-          SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              'Search something',
-              style: TextStyle(
-                fontSize: 11,
-                color: Color(0xFFB7C0D1),
-              ),
-            ),
-          ),
-          Icon(
-            Icons.tune_rounded,
-            color: Color(0xFFB7C0D1),
-            size: 21,
-          ),
-        ],
-      ),
+        )),
+        IconButton(
+          onPressed: () => context.read<MedicalCubit>().toggleSort(),
+          icon: const Icon(Icons.tune_rounded, color: Color(0xFFB7C0D1), size: 21),
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(),
+        ),
+      ]),
     );
   }
 
@@ -356,6 +375,8 @@ class HomeScreen extends StatelessWidget {
     required String name,
     required String speciality,
     required String address,
+    required bool favorite,
+    required VoidCallback onFavorite,
   }) {
     return Row(
       children: [
@@ -407,10 +428,13 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
         ),
-        const Icon(
-          Icons.favorite_border_rounded,
-          size: 20,
-          color: Color(0xFFAEB7C2),
+        GestureDetector(
+          onTap: onFavorite,
+          child: Icon(
+            favorite ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+            size: 20,
+            color: favorite ? Colors.redAccent : const Color(0xFFAEB7C2),
+          ),
         ),
       ],
     );

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'main.dart';
+import '../main.dart';
 
 class AppointmentScreen extends StatelessWidget {
   const AppointmentScreen({super.key});
@@ -61,6 +61,7 @@ class AppointmentScreen extends StatelessWidget {
 
                 const SizedBox(height: 72),
 
+                // Doar element vizual. Nu are functionalitate.
                 Container(
                   height: 54,
                   alignment: Alignment.center,
@@ -96,6 +97,7 @@ class AppointmentScreen extends StatelessWidget {
             child: IconButton(
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
+              // Aceasta doar revine la pagina anterioara.
               onPressed: () => Navigator.pop(context),
               icon: const Icon(
                 Icons.arrow_back_ios_new_rounded,
@@ -219,6 +221,8 @@ class AppointmentScreen extends StatelessWidget {
     );
   }
 
+  // Acestea NU sunt butoane.
+  // Culorile sunt fixe doar pentru a copia designul Figma.
   Widget _staticOptions(
     List<String> labels, {
     required int activeIndex,
